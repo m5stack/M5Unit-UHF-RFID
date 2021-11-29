@@ -179,8 +179,11 @@ String JRD_4035::getVersion() {
     sendCMD((uint8_t *)HARDWARE_VERSION_CMD, sizeof(HARDWARE_VERSION_CMD));
     if(waitMsg()) {
         String info;
-        for(uint8_t i=0; i < (buffer[3] <<8 | buffer[4]); i++) {
+        for(uint8_t i=0; i < 50; i++) {
            info += (char)buffer[6+i];
+           if(buffer[8+i] == 0x7e){
+               break;
+           }
         }
         return info;
     }else{
@@ -381,6 +384,31 @@ bool JRD_4035::readCard(
             temp[i] = buffer[20+i];
         }
         memcpy(data, temp, size);
+        return true;
+    }else{
+        return false;
+    }
+}
+
+
+//2600 => 26dB
+bool JRD_4035::setTxPower(uint16_t db) {
+
+    memcpy(buffer, SET_TX_POWER, sizeof(SET_TX_POWER));
+    buffer[5] = (db>>8) & 0xff;
+    buffer[6] = db & 0xff;
+
+    uint8_t check = 0;
+
+    for(uint8_t i=1; i<7; i++){
+        check+=buffer[i];
+    }
+    buffer[7] = check & 0xff;
+    sendCMD(buffer, sizeof(SET_TX_POWER));
+    if(waitMsg()) {
+        if( buffer[2] != 0xB6){
+            return false;
+        }
         return true;
     }else{
         return false;

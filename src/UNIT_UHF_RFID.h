@@ -44,6 +44,7 @@ public:
   uint8_t pollingOnce();
   uint8_t pollingMultiple(uint16_t polling_count);
   bool select(uint8_t *epc);
+  bool setTxPower(uint16_t db);
   bool writeCard(uint8_t *data, size_t size, uint8_t membank, uint16_t sa, uint32_t access_password = 0);
   bool readCard(uint8_t *data, size_t size, uint8_t membank, uint16_t sa, uint32_t access_password = 0);
 };
