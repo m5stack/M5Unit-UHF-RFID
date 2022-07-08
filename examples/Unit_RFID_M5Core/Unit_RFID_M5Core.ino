@@ -6,11 +6,11 @@
 * Visit for more information: https://docs.m5stack.com/en/unit/uhf_rfid
 * 获取更多资料请访问: https://docs.m5stack.com/zh_CN/unit/uhf_rfid
 *
-* describe: UHF RFID UNIT
-* date: 2021/11/29
+* Product: UHF RFID UNIT
+* Date: 2022/7/8
 *******************************************************************************
 Please connect to Port C / 请连接端口C
-How to use:
+How to use: / 如何使用
 1. Polling Card EPC
 2. Select Card EPC
 3. Write or Read Card Info
@@ -19,11 +19,11 @@ How to use:
 #include <M5Stack.h>
 #include <M5GFX.h>
 
-#include "UNIT_UHF_RFID.h"
+#include "Unit_UHF_RFID.h"
 
 M5GFX display;
 M5Canvas canvas(&display);
-JRD_4035 uhf;
+Unit_UHF_RFID uhf;
 
 String info = "";
 

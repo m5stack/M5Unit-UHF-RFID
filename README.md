@@ -1,8 +1,8 @@
-# UNIT_UHF_RFID
+# M5Unit-UHF-RFID
 
 ## Overview
 
-Contains M5Stack-**UNIT UHF RFID** series related case programs. 
+Contains M5Stack-**UNIT UHF RFID** series related case programs.
 
 ## Related Link
 
@@ -10,4 +10,4 @@ Contains M5Stack-**UNIT UHF RFID** series related case programs.
 
 ## License
 
-- [UNIT UHF RFID - MIT](LICENSE)
+- [M5Unit-UHF-RFID - MIT](LICENSE)
