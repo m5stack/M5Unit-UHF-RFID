@@ -136,7 +136,7 @@ uint8_t Unit_UHF_RFID::pollingOnce() {
 uint8_t Unit_UHF_RFID::pollingMultiple(uint16_t polling_count) {
     cleanCardsBuffer();
     memcpy(buffer, POLLING_MULTIPLE_CMD, sizeof(POLLING_MULTIPLE_CMD));
-    buffer[6] = (polling_count >> 88) & 0xff;
+    buffer[6] = (polling_count >> 8) & 0xff;
     buffer[7] = (polling_count)&0xff;
 
     uint8_t check = 0;
