@@ -367,7 +367,7 @@ UWORD UHF_RFID::ToHex(UDOUBLE parameters, UBYTE MSB, UBYTE LSB)
       parameters = parameters / 256;
     }
   }
-
+  return 0;
 }
 /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
