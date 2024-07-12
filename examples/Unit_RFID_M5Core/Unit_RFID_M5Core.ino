@@ -1,20 +1,8 @@
 /*
-*******************************************************************************
-* Copyright (c) 2021 by M5Stack
-*                  Equipped with M5Core sample source code
-*                          配套  M5Core 示例源代码
-* Visit for more information: https://docs.m5stack.com/en/unit/uhf_rfid
-* 获取更多资料请访问: https://docs.m5stack.com/zh_CN/unit/uhf_rfid
-*
-* Product: UHF RFID UNIT
-* Date: 2022/7/8
-*******************************************************************************
-Please connect to Port C / 请连接端口C
-How to use: / 如何使用
-1. Polling Card EPC
-2. Select Card EPC
-3. Write or Read Card Info
-*/
+ * SPDX-FileCopyrightText: 2024 M5Stack Technology CO LTD
+ *
+ * SPDX-License-Identifier: MIT
+ */
 
 #include <M5Stack.h>
 #include <M5GFX.h>
@@ -73,8 +61,7 @@ void loop() {
         log("Write Data...");
         // uhf.writeCard(uint8_t *data, size_t size, uint8_t membank, uint16_t
         // sa, uint32_t access_password = 0);
-        if (uhf.writeCard(write_buffer, sizeof(write_buffer), 0x04, 0,
-                          0x00000000)) {
+        if (uhf.writeCard(write_buffer, sizeof(write_buffer), 0x04, 0, 0x00000000)) {
             log("Write OK");
         } else {
             log("Write ERROR");
@@ -83,8 +70,7 @@ void loop() {
         log("Read Data...");
         // uhf.readCard(uint8_t *data, size_t size, uint8_t membank, uint16_t
         // sa, uint32_t access_password = 0);
-        if (uhf.readCard(reade_buffer, sizeof(reade_buffer), 0x04, 0,
-                         0x00000000)) {
+        if (uhf.readCard(reade_buffer, sizeof(reade_buffer), 0x04, 0, 0x00000000)) {
             log("Read OK");
             log("Data Content");
             for (uint8_t i = 0; i < sizeof(reade_buffer); i++) {

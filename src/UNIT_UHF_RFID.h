@@ -1,11 +1,7 @@
-/*!
- * @brief An ultra-high frequency (UHF) embedded wireless radio frequency
- * reader module From M5Stack
- * @copyright Copyright (c) 2022 by M5Stack[https://m5stack.com]
+/*
+ * SPDX-FileCopyrightText: 2024 M5Stack Technology CO LTD
  *
- * @Links [Unit UHF-RFID](https://docs.m5stack.com/en/unit/uhf_rfid)
- * @version  V0.0.1
- * @date  2022-07-08
+ * SPDX-License-Identifier: MIT
  */
 #ifndef _UNIT_UHF_RFID_H_
 #define _UNIT_UHF_RFID_H_
@@ -46,18 +42,16 @@ class Unit_UHF_RFID {
     CARD cards[200];
 
    public:
-    void begin(HardwareSerial *serial = &Serial2, int baud = 115200,
-               uint8_t RX = 16, uint8_t TX = 17, bool debug = false);
+    void begin(HardwareSerial *serial = &Serial2, int baud = 115200, uint8_t RX = 16, uint8_t TX = 17,
+               bool debug = false);
     String getVersion();
     String selectInfo();
     uint8_t pollingOnce();
     uint8_t pollingMultiple(uint16_t polling_count);
     bool select(uint8_t *epc);
     bool setTxPower(uint16_t db);
-    bool writeCard(uint8_t *data, size_t size, uint8_t membank, uint16_t sa,
-                   uint32_t access_password = 0);
-    bool readCard(uint8_t *data, size_t size, uint8_t membank, uint16_t sa,
-                  uint32_t access_password = 0);
+    bool writeCard(uint8_t *data, size_t size, uint8_t membank, uint16_t sa, uint32_t access_password = 0);
+    bool readCard(uint8_t *data, size_t size, uint8_t membank, uint16_t sa, uint32_t access_password = 0);
 };
 
 #endif

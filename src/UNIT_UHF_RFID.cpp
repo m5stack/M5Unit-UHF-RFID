@@ -1,3 +1,8 @@
+/*
+ * SPDX-FileCopyrightText: 2024 M5Stack Technology CO LTD
+ *
+ * SPDX-License-Identifier: MIT
+ */
 #include "Unit_UHF_RFID.h"
 #include "CMD.h"
 
@@ -10,8 +15,7 @@ String hex2str(uint8_t num) {
 }
 
 /*! @brief Initialize the Unit UHF_RFID.*/
-void Unit_UHF_RFID::begin(HardwareSerial *serial, int baud, uint8_t RX,
-                          uint8_t TX, bool debug) {
+void Unit_UHF_RFID::begin(HardwareSerial *serial, int baud, uint8_t RX, uint8_t TX, bool debug) {
     _debug  = debug;
     _serial = serial;
     _serial->begin(baud, SERIAL_8N1, RX, TX);
@@ -27,14 +31,7 @@ void Unit_UHF_RFID::cleanBuffer() {
 /*! @brief Clear the card's data buffer.*/
 void Unit_UHF_RFID::cleanCardsBuffer() {
     for (int i = 0; i < 200; i++) {
-        cards[i] = {
-            rssi : 0,
-            pc : {0},
-            epc : {0},
-            rssi_str : "",
-            pc_str : "",
-            epc_str : ""
-        };
+        cards[i] = {rssi : 0, pc : {0}, epc : {0}, rssi_str : "", pc_str : "", epc_str : ""};
     }
 }
 
@@ -137,7 +134,7 @@ uint8_t Unit_UHF_RFID::pollingMultiple(uint16_t polling_count) {
     cleanCardsBuffer();
     memcpy(buffer, POLLING_MULTIPLE_CMD, sizeof(POLLING_MULTIPLE_CMD));
     buffer[6] = (polling_count >> 8) & 0xff;
-    buffer[7] = (polling_count)&0xff;
+    buffer[7] = (polling_count) & 0xff;
 
     uint8_t check = 0;
     for (uint8_t i = 1; i < 8; i++) {
@@ -189,8 +186,7 @@ String Unit_UHF_RFID::getVersion() {
 }
 
 String Unit_UHF_RFID::selectInfo() {
-    sendCMD((uint8_t *)GET_SELECT_PARAMETER_CMD,
-            sizeof(GET_SELECT_PARAMETER_CMD));
+    sendCMD((uint8_t *)GET_SELECT_PARAMETER_CMD, sizeof(GET_SELECT_PARAMETER_CMD));
     if (waitMsg()) {
         String Info = "";
         for (uint8_t i = 12; i < 24; i++) {
@@ -261,8 +257,7 @@ bool Unit_UHF_RFID::select(uint8_t *epc) {
     }
 }
 
-bool Unit_UHF_RFID::writeCard(uint8_t *data, size_t size, uint8_t membank,
-                              uint16_t sa, uint32_t access_password) {
+bool Unit_UHF_RFID::writeCard(uint8_t *data, size_t size, uint8_t membank, uint16_t sa, uint32_t access_password) {
     memcpy(buffer, WRITE_STORAGE_CMD, sizeof(WRITE_STORAGE_CMD));
     buffer[5] = (access_password >> 24) & 0xff;
     buffer[6] = (access_password >> 16) & 0xff;
@@ -319,8 +314,7 @@ bool Unit_UHF_RFID::writeCard(uint8_t *data, size_t size, uint8_t membank,
     }
 }
 
-bool Unit_UHF_RFID::readCard(uint8_t *data, size_t size, uint8_t membank,
-                             uint16_t sa, uint32_t access_password) {
+bool Unit_UHF_RFID::readCard(uint8_t *data, size_t size, uint8_t membank, uint16_t sa, uint32_t access_password) {
     memcpy(buffer, READ_STORAGE_CMD, sizeof(READ_STORAGE_CMD));
     buffer[5]    = (access_password >> 24) & 0xff;
     buffer[6]    = (access_password >> 16) & 0xff;
