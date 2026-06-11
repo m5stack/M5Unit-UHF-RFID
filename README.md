@@ -1,3 +1,5 @@
+# 🚫 Deprecated — Please use [M5Unit-RFID](https://github.com/m5stack/M5Unit-RFID)
+
 # M5Unit-UHF-RFID
 
 ## Overview
