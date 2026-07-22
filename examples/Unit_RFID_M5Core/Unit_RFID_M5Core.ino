@@ -15,6 +15,35 @@ Unit_UHF_RFID uhf;
 
 String info = "";
 
+String REGIONS[] = {
+    "invalid",      // 0
+    "China 900MHz", // 1
+    "America",      // 2
+    "Europe",       // 3
+    "China 800MHz", // 4
+    "reserved",     // 5
+    "South Korea"   // 6
+};
+
+#define TARGET_REGION   3
+
+static bool setRegion(uint8_t targetRegion) {
+  uint8_t _region = uhf.getOperatingRegion();
+  Serial.printf("Region: %d - %s", _region, REGIONS[_region].c_str());
+
+  if (_region != targetRegion) {
+    bool res = uhf.setOperatingRegion(targetRegion);
+    if (!res) {
+      Serial.printf("Region change failed");
+      return false;
+    }
+    uint8_t _region = uhf.getOperatingRegion();
+    Serial.printf("Region: %d - %s", _region, REGIONS[_region].c_str());
+  }
+
+  return true;
+}
+
 void setup() {
     M5.begin();  // Init M5Core.  初始化 M5Core
     // Serial2.begin(unsigned long baud, uint32_t config, int8_t rxPin, int8_t
@@ -29,7 +58,9 @@ void setup() {
             break;
         }
     }
-
+    
+    setRegion(TARGET_REGION);
+    
     // max: 26dB
     uhf.setTxPower(2600);
 
