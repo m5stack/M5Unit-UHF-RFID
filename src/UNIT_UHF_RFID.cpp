@@ -185,6 +185,37 @@ String Unit_UHF_RFID::getVersion() {
     }
 }
 
+/*! @brief Get Operating Region */
+uint8_t Unit_UHF_RFID::getOperatingRegion() {
+    sendCMD((uint8_t *)GET_OPERATING_REGION_CMD, sizeof(GET_OPERATING_REGION_CMD));
+    if (waitMsg()) {
+        return buffer[5];
+    } else {
+        return 0;
+    }
+}
+
+/*! @brief Set Operating Region */
+bool Unit_UHF_RFID::setOperatingRegion(uint8_t region) {
+    memcpy(buffer, SET_OPERATING_REGION_CMD, sizeof(SET_OPERATING_REGION_CMD));
+    buffer[5] = region;
+
+    buffer[6] = (buffer[6] + region) & 0xff;
+
+    sendCMD(buffer, sizeof(SET_OPERATING_REGION_CMD));
+    if (waitMsg()) {
+        if (_debug) {
+            for (uint8_t i = 0; i < 25; i++) {
+                Serial.print(hex2str(buffer[i]));
+            }
+            Serial.println(" ");
+        }
+        return true;
+    } else {
+        return false;
+    }
+}
+
 String Unit_UHF_RFID::selectInfo() {
     sendCMD((uint8_t *)GET_SELECT_PARAMETER_CMD, sizeof(GET_SELECT_PARAMETER_CMD));
     if (waitMsg()) {
