@@ -28,7 +28,7 @@ String REGIONS[] = {
 // Set your target region
 #define TARGET_REGION   3
 
-static bool setRegion(uint8_t targetRegion) {
+[[maybe_unused]] static bool setRegion(uint8_t targetRegion) {
   uint8_t _region;
   if (uhf.getOperatingRegion(_region)) {
     log("Region: " + String(_region) + " - " + REGIONS[_region]);
