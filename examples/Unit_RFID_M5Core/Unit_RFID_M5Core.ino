@@ -37,7 +37,7 @@ static bool setRegion(uint8_t targetRegion) {
   }
 
   if (_region != targetRegion) {
-    if (!uhf.setOperatingRegion(targetRegion);) {
+    if (!uhf.setOperatingRegion(targetRegion)) {
       log("setOperatingRegion() failed.");
       return false;
     }
