@@ -29,17 +29,23 @@ String REGIONS[] = {
 #define TARGET_REGION   3
 
 static bool setRegion(uint8_t targetRegion) {
-  uint8_t _region = uhf.getOperatingRegion();
-  Serial.printf("Region: %d - %s", _region, REGIONS[_region].c_str());
+  uint8_t _region;
+  if (uhf.getOperatingRegion(_region)) {
+    log("Region: " + String(_region) + " - " + REGIONS[_region]);
+  } else {
+    log("getOperatingRegion() failed.");
+  }
 
   if (_region != targetRegion) {
-    bool res = uhf.setOperatingRegion(targetRegion);
-    if (!res) {
-      Serial.printf("Region change failed");
+    if (!uhf.setOperatingRegion(targetRegion);) {
+      log("setOperatingRegion() failed.");
       return false;
     }
-    uint8_t _region = uhf.getOperatingRegion();
-    Serial.printf("Region: %d - %s", _region, REGIONS[_region].c_str());
+    if (uhf.getOperatingRegion(_region)) {
+      log("Region: " + String(_region) + " - " + REGIONS[_region]);
+    } else {
+      log("getOperatingRegion() failed.");
+    }
   }
 
   return true;
