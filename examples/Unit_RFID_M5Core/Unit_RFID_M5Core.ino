@@ -25,6 +25,7 @@ String REGIONS[] = {
     "South Korea"   // 6
 };
 
+// Set your target region
 #define TARGET_REGION   3
 
 static bool setRegion(uint8_t targetRegion) {
@@ -58,8 +59,9 @@ void setup() {
             break;
         }
     }
-    
-    setRegion(TARGET_REGION);
+
+    #pragma message "Use setRegion() to set your target region"
+    //setRegion(TARGET_REGION);
     
     // max: 26dB
     uhf.setTxPower(2600);
