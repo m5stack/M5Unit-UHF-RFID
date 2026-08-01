@@ -210,7 +210,7 @@ bool Unit_UHF_RFID::getOperatingRegion(uint8_t &region)
 /*! @brief Set the current operating region. */
 bool Unit_UHF_RFID::setOperatingRegion(uint8_t region)
 {
-    if (region > 6)
+    if ((region == 5) || (region > 6))
     {
         return false;
     }
