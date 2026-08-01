@@ -185,35 +185,57 @@ String Unit_UHF_RFID::getVersion() {
     }
 }
 
-/*! @brief Get Operating Region */
-uint8_t Unit_UHF_RFID::getOperatingRegion() {
+/*! @brief Get the current operating region. */
+bool Unit_UHF_RFID::getOperatingRegion(uint8_t &region)
+{
     sendCMD((uint8_t *)GET_OPERATING_REGION_CMD, sizeof(GET_OPERATING_REGION_CMD));
-    if (waitMsg()) {
-        return buffer[5];
-    } else {
-        return 0;
-    }
-}
-
-/*! @brief Set Operating Region */
-bool Unit_UHF_RFID::setOperatingRegion(uint8_t region) {
-    memcpy(buffer, SET_OPERATING_REGION_CMD, sizeof(SET_OPERATING_REGION_CMD));
-    buffer[5] = region;
-
-    buffer[6] = (buffer[6] + region) & 0xff;
-
-    sendCMD(buffer, sizeof(SET_OPERATING_REGION_CMD));
-    if (waitMsg()) {
+    if (waitMsg())
+    {
         if (_debug) {
             for (uint8_t i = 0; i < 25; i++) {
                 Serial.print(hex2str(buffer[i]));
             }
             Serial.println(" ");
         }
-        return true;
-    } else {
+
+        if (buffer[2] == GET_OPERATING_REGION_CMD[2])
+        {
+            region = buffer[5];
+            return true;
+        }
+    }
+    return false;
+}
+
+/*! @brief Set the current operating region. */
+bool Unit_UHF_RFID::setOperatingRegion(uint8_t region)
+{
+    if (region > 6)
+    {
         return false;
     }
+
+    memcpy(buffer, SET_OPERATING_REGION_CMD, sizeof(SET_OPERATING_REGION_CMD));
+    buffer[5] = region;
+
+    buffer[6] = (buffer[6] + region) & 0xff;
+
+    sendCMD(buffer, sizeof(SET_OPERATING_REGION_CMD));
+    if (waitMsg())
+    {
+        if (_debug) {
+            for (uint8_t i = 0; i < 25; i++) {
+                Serial.print(hex2str(buffer[i]));
+            }
+            Serial.println(" ");
+        }
+
+        if (buffer[2] == SET_OPERATING_REGION_CMD[2])
+        {
+            return true;
+        }
+    }
+    return false;
 }
 
 String Unit_UHF_RFID::selectInfo() {
