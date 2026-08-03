@@ -321,6 +321,10 @@ bool Unit_UHF_RFID::readCard(uint8_t *data, size_t size, uint8_t membank, uint16
     buffer[7]    = (access_password >> 8) & 0xff;
     buffer[8]    = access_password & 0xff;
     buffer[9]    = membank;
+
+    buffer[10] = (sa >> 8) & 0xff;
+    buffer[11] = sa & 0xff;
+    
     uint8_t word = size / 2;
     buffer[12]   = (word >> 8) & 0xff;
     buffer[13]   = word & 0xff;
