@@ -74,12 +74,6 @@ void setup() {
         }
     }
 
-    #pragma message "Use setRegion() to set your target region"
-    //setRegion(TARGET_REGION);
-    
-    // max: 26dB
-    uhf.setTxPower(2600);
-
     display.begin();
     canvas.setColorDepth(1);  // mono color
     canvas.setFont(&fonts::efontCN_14);
@@ -87,6 +81,13 @@ void setup() {
     canvas.setTextSize(2);
     canvas.setPaletteColor(1, GREEN);
     canvas.setTextScroll(true);
+
+    #pragma message "Use setRegion() to set your target region"
+    //setRegion(TARGET_REGION);
+    
+    // max: 26dB
+    uhf.setTxPower(2600);
+    
     canvas.println(info);
     canvas.println("1.BtnB Polling Card EPC");
     canvas.println("2.BtnC Select Card EPC");
