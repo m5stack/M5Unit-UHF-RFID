@@ -28,6 +28,12 @@ String REGIONS[] = {
 // Set your target region
 #define TARGET_REGION   3
 
+void log(String info) {
+    Serial.println("Write Data...");
+    canvas.println(info);
+    canvas.pushSprite(0, 0);
+}
+
 [[maybe_unused]] static bool setRegion(uint8_t targetRegion) {
   uint8_t _region;
   if (uhf.getOperatingRegion(_region)) {
@@ -88,12 +94,6 @@ void setup() {
 
 uint8_t write_buffer[]  = {0xab, 0xcd, 0xef, 0xdd};
 uint8_t reade_buffer[4] = {0};
-
-void log(String info) {
-    Serial.println("Write Data...");
-    canvas.println(info);
-    canvas.pushSprite(0, 0);
-}
 
 void loop() {
     if (M5.BtnA.wasPressed()) {
