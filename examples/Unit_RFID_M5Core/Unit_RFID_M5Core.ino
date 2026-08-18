@@ -40,6 +40,7 @@ void log(String info) {
     log("Region: " + String(_region) + " - " + REGIONS[_region]);
   } else {
     log("getOperatingRegion() failed.");
+    return false;
   }
 
   if (_region != targetRegion) {
@@ -51,6 +52,7 @@ void log(String info) {
       log("Region: " + String(_region) + " - " + REGIONS[_region]);
     } else {
       log("getOperatingRegion() failed.");
+      return false;
     }
   }
 
