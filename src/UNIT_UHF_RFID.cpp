@@ -14,6 +14,14 @@ String hex2str(uint8_t num) {
     }
 }
 
+uint8_t calculateChecksum(const uint8_t *data, size_t offset, size_t length) {
+    uint8_t checksum = 0;
+    for (size_t i = offset; i < offset + length; i++) {
+        checksum += data[i];
+    }
+    return checksum;
+}
+
 /*! @brief Initialize the Unit UHF_RFID.*/
 void Unit_UHF_RFID::begin(HardwareSerial *serial, int baud, uint8_t RX, uint8_t TX, bool debug) {
     _debug  = debug;
@@ -198,9 +206,16 @@ bool Unit_UHF_RFID::getOperatingRegion(uint8_t &region)
             Serial.println(" ");
         }
 
-        if (buffer[2] == GET_OPERATING_REGION_CMD[2])
+        const uint8_t responseType = 0x01;
+        const uint16_t payloadLength = (static_cast<uint16_t>(buffer[3]) << 8) | buffer[4];
+        const uint8_t responseChecksum = calculateChecksum(buffer, 1, 5);
+        const uint8_t receivedRegion = buffer[5];
+
+        if ((buffer[1] == responseType) && (buffer[2] == GET_OPERATING_REGION_CMD[2]) &&
+            (payloadLength == 1) && (buffer[6] == responseChecksum) && (receivedRegion != 0) &&
+            (receivedRegion != 5) && (receivedRegion <= 6))
         {
-            region = buffer[5];
+            region = receivedRegion;
             return true;
         }
     }
@@ -218,7 +233,7 @@ bool Unit_UHF_RFID::setOperatingRegion(uint8_t region)
     memcpy(buffer, SET_OPERATING_REGION_CMD, sizeof(SET_OPERATING_REGION_CMD));
     buffer[5] = region;
 
-    buffer[6] = (buffer[6] + region) & 0xff;
+    buffer[6] = calculateChecksum(buffer, 1, 5);
 
     sendCMD(buffer, sizeof(SET_OPERATING_REGION_CMD));
     if (waitMsg())
