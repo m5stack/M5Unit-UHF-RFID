@@ -4,13 +4,21 @@
  * SPDX-License-Identifier: MIT
  */
 
-#include <M5Stack.h>
-#include <M5GFX.h>
+#include <M5Unified.h>
 
 #include "UNIT_UHF_RFID.h"
 
-M5GFX display;
-M5Canvas canvas(&display);
+#if defined(ARDUINO_M5STACK_CORE_ESP32)
+constexpr int UHF_RX_PIN = 16;
+constexpr int UHF_TX_PIN = 17;
+#elif defined(ARDUINO_M5STACK_CORE2)
+constexpr int UHF_RX_PIN = 13;
+constexpr int UHF_TX_PIN = 14;
+#else
+#error "Define UHF_RX_PIN and UHF_TX_PIN for this board."
+#endif
+
+M5Canvas canvas(&M5.Display);
 Unit_UHF_RFID uhf;
 
 String info = "";
@@ -29,7 +37,7 @@ String REGIONS[] = {
 #define TARGET_REGION   3
 
 void log(String info) {
-    Serial.println("Write Data...");
+    Serial.println(info);
     canvas.println(info);
     canvas.pushSprite(0, 0);
 }
@@ -61,11 +69,15 @@ void log(String info) {
 
 void setup() {
     M5.begin();  // Init M5Core.  初始化 M5Core
+    Serial.begin(115200);
+    
+    
     // Serial2.begin(unsigned long baud, uint32_t config, int8_t rxPin, int8_t
     // txPin, bool invert) uhf.begin(HardwareSerial *serial = &Serial2, int
     // baud=115200, uint8_t RX = 16, uint8_t TX = 17, bool debug = false);
-    uhf.begin(&Serial2, 115200, 16, 17, false);
-    //   uhf.begin();
+    uhf.begin(&Serial2, 115200, UHF_RX_PIN, UHF_TX_PIN, false);
+    //uhf.begin();
+
     while (1) {
         info = uhf.getVersion();
         if (info != "ERROR") {
@@ -73,11 +85,9 @@ void setup() {
             break;
         }
     }
-
-    display.begin();
     canvas.setColorDepth(1);  // mono color
     canvas.setFont(&fonts::efontCN_14);
-    canvas.createSprite(display.width(), display.height());
+    canvas.createSprite(M5.Display.width(), M5.Display.height());
     canvas.setTextSize(2);
     canvas.setPaletteColor(1, GREEN);
     canvas.setTextScroll(true);
@@ -133,7 +143,7 @@ void loop() {
         if (result > 0) {
             for (uint8_t i = 0; i < result; i++) {
                 log("pc: " + uhf.cards[i].pc_str);
-                log("rssi: " + uhf.cards[i].rssi_str);
+                log("rssi: " + String((int8_t)uhf.cards[i].rssi) + "dBm");
                 log("epc: " + uhf.cards[i].epc_str);
                 log("-----------------");
                 delay(10);
