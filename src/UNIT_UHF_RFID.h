@@ -45,6 +45,8 @@ class Unit_UHF_RFID {
     void begin(HardwareSerial *serial = &Serial2, int baud = 115200, uint8_t RX = 16, uint8_t TX = 17,
                bool debug = false);
     String getVersion();
+    bool getOperatingRegion(uint8_t &region);
+    bool setOperatingRegion(uint8_t region);
     String selectInfo();
     uint8_t pollingOnce();
     uint8_t pollingMultiple(uint16_t polling_count);

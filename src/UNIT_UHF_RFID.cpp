@@ -3,7 +3,7 @@
  *
  * SPDX-License-Identifier: MIT
  */
-#include "Unit_UHF_RFID.h"
+#include "UNIT_UHF_RFID.h"
 #include "CMD.h"
 
 String hex2str(uint8_t num) {
@@ -12,6 +12,14 @@ String hex2str(uint8_t num) {
     } else {
         return ("0" + String(num, HEX));
     }
+}
+
+uint8_t calculateChecksum(const uint8_t *data, size_t offset, size_t length) {
+    uint8_t checksum = 0;
+    for (size_t i = offset; i < offset + length; i++) {
+        checksum += data[i];
+    }
+    return checksum;
 }
 
 /*! @brief Initialize the Unit UHF_RFID.*/
@@ -183,6 +191,66 @@ String Unit_UHF_RFID::getVersion() {
     } else {
         return "ERROR";
     }
+}
+
+/*! @brief Get the current operating region. */
+bool Unit_UHF_RFID::getOperatingRegion(uint8_t &region)
+{
+    sendCMD((uint8_t *)GET_OPERATING_REGION_CMD, sizeof(GET_OPERATING_REGION_CMD));
+    if (waitMsg())
+    {
+        if (_debug) {
+            for (uint8_t i = 0; i < 25; i++) {
+                Serial.print(hex2str(buffer[i]));
+            }
+            Serial.println(" ");
+        }
+
+        const uint8_t responseType = 0x01;
+        const uint16_t payloadLength = (static_cast<uint16_t>(buffer[3]) << 8) | buffer[4];
+        const uint8_t responseChecksum = calculateChecksum(buffer, 1, 5);
+        const uint8_t receivedRegion = buffer[5];
+
+        if ((buffer[1] == responseType) && (buffer[2] == GET_OPERATING_REGION_CMD[2]) &&
+            (payloadLength == 1) && (buffer[6] == responseChecksum) && (receivedRegion != 0) &&
+            (receivedRegion != 5) && (receivedRegion <= 6))
+        {
+            region = receivedRegion;
+            return true;
+        }
+    }
+    return false;
+}
+
+/*! @brief Set the current operating region. */
+bool Unit_UHF_RFID::setOperatingRegion(uint8_t region)
+{
+    if ((region == 0) || (region == 5) || (region > 6))
+    {
+        return false;
+    }
+
+    memcpy(buffer, SET_OPERATING_REGION_CMD, sizeof(SET_OPERATING_REGION_CMD));
+    buffer[5] = region;
+
+    buffer[6] = calculateChecksum(buffer, 1, 5);
+
+    sendCMD(buffer, sizeof(SET_OPERATING_REGION_CMD));
+    if (waitMsg())
+    {
+        if (_debug) {
+            for (uint8_t i = 0; i < 25; i++) {
+                Serial.print(hex2str(buffer[i]));
+            }
+            Serial.println(" ");
+        }
+
+        if (buffer[2] == SET_OPERATING_REGION_CMD[2])
+        {
+            return true;
+        }
+    }
+    return false;
 }
 
 String Unit_UHF_RFID::selectInfo() {
