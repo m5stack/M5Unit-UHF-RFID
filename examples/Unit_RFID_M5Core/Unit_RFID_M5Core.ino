@@ -4,24 +4,80 @@
  * SPDX-License-Identifier: MIT
  */
 
-#include <M5Stack.h>
-#include <M5GFX.h>
+#include <M5Unified.h>
 
 #include "UNIT_UHF_RFID.h"
 
-M5GFX display;
-M5Canvas canvas(&display);
+#if defined(ARDUINO_M5STACK_CORE_ESP32)
+constexpr int UHF_RX_PIN = 16;
+constexpr int UHF_TX_PIN = 17;
+#elif defined(ARDUINO_M5STACK_CORE2)
+constexpr int UHF_RX_PIN = 13;
+constexpr int UHF_TX_PIN = 14;
+#else
+#error "Define UHF_RX_PIN and UHF_TX_PIN for this board."
+#endif
+
+M5Canvas canvas(&M5.Display);
 Unit_UHF_RFID uhf;
 
 String info = "";
 
+String REGIONS[] = {
+    "invalid",      // 0
+    "China 900MHz", // 1
+    "America",      // 2
+    "Europe",       // 3
+    "China 800MHz", // 4
+    "reserved",     // 5
+    "South Korea"   // 6
+};
+
+// Set your target region
+#define TARGET_REGION   3
+
+void log(String info) {
+    Serial.println(info);
+    canvas.println(info);
+    canvas.pushSprite(0, 0);
+}
+
+[[maybe_unused]] static bool setRegion(uint8_t targetRegion) {
+  uint8_t _region;
+  if (uhf.getOperatingRegion(_region)) {
+    log("Region: " + String(_region) + " - " + REGIONS[_region]);
+  } else {
+    log("getOperatingRegion() failed.");
+    return false;
+  }
+
+  if (_region != targetRegion) {
+    if (!uhf.setOperatingRegion(targetRegion)) {
+      log("setOperatingRegion() failed.");
+      return false;
+    }
+    if (uhf.getOperatingRegion(_region)) {
+      log("Region: " + String(_region) + " - " + REGIONS[_region]);
+    } else {
+      log("getOperatingRegion() failed.");
+      return false;
+    }
+  }
+
+  return true;
+}
+
 void setup() {
     M5.begin();  // Init M5Core.  初始化 M5Core
+    Serial.begin(115200);
+    
+    
     // Serial2.begin(unsigned long baud, uint32_t config, int8_t rxPin, int8_t
     // txPin, bool invert) uhf.begin(HardwareSerial *serial = &Serial2, int
     // baud=115200, uint8_t RX = 16, uint8_t TX = 17, bool debug = false);
-    uhf.begin(&Serial2, 115200, 16, 17, false);
-    //   uhf.begin();
+    uhf.begin(&Serial2, 115200, UHF_RX_PIN, UHF_TX_PIN, false);
+    //uhf.begin();
+
     while (1) {
         info = uhf.getVersion();
         if (info != "ERROR") {
@@ -29,17 +85,19 @@ void setup() {
             break;
         }
     }
-
-    // max: 26dB
-    uhf.setTxPower(2600);
-
-    display.begin();
     canvas.setColorDepth(1);  // mono color
     canvas.setFont(&fonts::efontCN_14);
-    canvas.createSprite(display.width(), display.height());
+    canvas.createSprite(M5.Display.width(), M5.Display.height());
     canvas.setTextSize(2);
     canvas.setPaletteColor(1, GREEN);
     canvas.setTextScroll(true);
+
+    #pragma message "Use setRegion() to set your target region"
+    //setRegion(TARGET_REGION);
+    
+    // max: 26dB
+    uhf.setTxPower(2600);
+    
     canvas.println(info);
     canvas.println("1.BtnB Polling Card EPC");
     canvas.println("2.BtnC Select Card EPC");
@@ -49,12 +107,6 @@ void setup() {
 
 uint8_t write_buffer[]  = {0xab, 0xcd, 0xef, 0xdd};
 uint8_t reade_buffer[4] = {0};
-
-void log(String info) {
-    Serial.println("Write Data...");
-    canvas.println(info);
-    canvas.pushSprite(0, 0);
-}
 
 void loop() {
     if (M5.BtnA.wasPressed()) {
@@ -91,7 +143,7 @@ void loop() {
         if (result > 0) {
             for (uint8_t i = 0; i < result; i++) {
                 log("pc: " + uhf.cards[i].pc_str);
-                log("rssi: " + uhf.cards[i].rssi_str);
+                log("rssi: " + String((int8_t)uhf.cards[i].rssi) + "dBm");
                 log("epc: " + uhf.cards[i].epc_str);
                 log("-----------------");
                 delay(10);
